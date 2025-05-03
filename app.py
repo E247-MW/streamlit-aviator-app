@@ -15,6 +15,27 @@ if seeds_input:
         seed = seed.strip()
         if not seed:
             continue
+            
+        full_hash = hashlib.sha512(seed.encode()).hexdigest()
+        risk, color = get_risk_level(full_hash)
+
+        # Odds prediction logic
+        first_digits = full_hash[:5]
+        dec_val = int(first_digits, 16)
+        odds = round(1 + (dec_val % 9500) / 100, 2)
+
+        results.append({
+            "Seed": seed,
+            "Hash (first 32)": full_hash[:32] + "...",
+            "Risk": risk,
+            "Predicted Odds": f"x{odds}"
+        })
+
+        st.markdown(f"**Seed:** `{seed}`")
+        st.markdown(f"<span style='color:{color}'>**Risk:** {risk}</span>", unsafe_allow_html=True)
+        st.markdown(f"**Predicted Odds:** x{odds}")
+        st.code(full_hash[:32] + "...", language="bash")
+        st.markdown("---")
 
         hash_hex = hashlib.sha512(seed.encode()).hexdigest()
         first_hex = hash_hex[:13]
